@@ -1,1 +1,30 @@
-name: iOS CI/CD Pipeline
+name: iOS CI/CD Pipelineon
+on:
+  push:
+    branches:
+     - main 
+  pull_request:
+  branches:
+    - main 
+
+jobs:
+  build:
+    runs-on: mac-os latest
+steps: 
+- name: Checkout 
+code uses: actions/checkout@v3 
+- name: Set up Ruby 
+uses: ruby/setup-ruby@v1 
+with: ruby-version: 2.7  # Specify your required Ruby version 
+- name: Install dependencies 
+run: bundle install 
+- name: Set up fastlane
+run: bundle exec fastlane install 
+- name: Build and test 
+run: bundle exec fastlane test 
+- name: Deploy to App Store 
+if:github.event_name == 'push' && github.ref == 'refs/heads/main' 
+run: bundle exec fastlane deploy 
+env:APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
